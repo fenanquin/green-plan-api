@@ -1,0 +1,19 @@
+{
+  "name": "green-plan-api",
+  "version": "1.0.0",
+  "description": "An API to track personal finances",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenanquin/green-plan-api.git"
+  },
+  "author": "Fernando Aquino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fenanquin/green-plan-api/issues"
+  },
+  "homepage": "https://github.com/fenanquin/green-plan-api#readme"
+}
