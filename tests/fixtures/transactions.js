@@ -2,17 +2,17 @@ const transactions = [
   {
     amount: 100,
     date: new Date(),
-    description: 'rent'
+    description: 'Rent bill'
   },
   {
     amount: 150,
     date: new Date(),
-    description: 'water'
+    description: 'Water bill'
   },
   {
     amount: 200,
-    date: new Date(),
-    description: 'gas'
+    date: new Date(0),
+    description: 'Gas bill'
   },
 ]
 

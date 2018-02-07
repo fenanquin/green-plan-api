@@ -1,16 +1,11 @@
 const Transaction = require('../../models/transaction');
 const transactions = require('../fixtures/transactions');
+const moment = require('moment');
 
-let t;
-let validTransaction;
-
+let transaction, transactionModel;
 beforeEach(() => {
-  validTransaction = {
-    amount: 0,
-    date: new Date(),
-    description: ''
-  };
-  t = new Transaction(validTransaction);
+  transaction = {... transactions[0]};
+  transactionModel = new Transaction(transactions[0]);
 });
 
 beforeEach((done) => {
@@ -22,73 +17,96 @@ afterEach((done) => {
 });
 
 test('should rejects transaction without amount field', () => {
-  delete validTransaction.amount;
-  t = new Transaction(validTransaction);
-  return expect(t.validate()).rejects.toBeTruthy();
+  delete transaction.amount;
+  transactionModel = new Transaction(transaction);
+  return expect(transactionModel.validate()).rejects.toBeTruthy();
 });
 
 test('should rejects transaction with amount equal to undefined or null', async () => {
-  t.amount = undefined;
-  await expect(t.validate()).rejects.toBeTruthy();
+  transactionModel.amount = undefined;
+  await expect(transactionModel.validate()).rejects.toBeTruthy();
 
-  t.amount = null;
-  await expect(t.validate()).rejects.toBeTruthy();
+  transactionModel.amount = null;
+  await expect(transactionModel.validate()).rejects.toBeTruthy();
 });
 
 test('should rejects transaction with amount other than a number', () => {
-  t.amount = false;
-  expect(t.amount).toBe(validTransaction.amount);
+  transactionModel.amount = false;
+  expect(typeof transactionModel.amount).toBe('number');
 
-  t.amount = '0.05';
-  expect(typeof t.amount).toBe('number');
+  transactionModel.amount = '0.05';
+  expect(typeof transactionModel.amount).toBe('number');
 });
 
 test('should rejects transaction without date field', () => {
-  delete validTransaction.date;
-  t = new Transaction(validTransaction);
-  return expect(t.validate()).rejects.toBeTruthy();
+  delete transaction.date;
+  transactionModel = new Transaction(transaction);
+  return expect(transactionModel.validate()).rejects.toBeTruthy();
 });
 
 test('should rejects transaction with date equal to undefined or null', async () => {
-  t.date = undefined;
-  await expect(t.validate()).rejects.toBeTruthy();
+  transactionModel.date = undefined;
+  await expect(transactionModel.validate()).rejects.toBeTruthy();
 
-  t.date = null;
-  await expect(t.validate()).rejects.toBeTruthy();
+  transactionModel.date = null;
+  await expect(transactionModel.validate()).rejects.toBeTruthy();
 });
 
 test('should rejects transactions with date field other than date', () => {
-  t.date = false;
-  expect(t.date).toBe(validTransaction.date);
+  transactionModel.date = false;
+  expect(transactionModel.date).toBe(transaction.date);
 
-  t.date = 0;
-  expect(t.date instanceof Date).toBe(true);
+  transactionModel.date = 0;
+  expect(transactionModel.date instanceof Date).toBe(true);
 });
 
 test('should rejects transactions without description field', () => {
-  delete validTransaction.description;
-  t = new Transaction(validTransaction);
-  return expect(t.validate()).rejects.toBeTruthy();
+  delete transaction.description;
+  transactionModel = new Transaction(transaction);
+  return expect(transactionModel.validate()).rejects.toBeTruthy();
 });
 
 test('should rejects transaction with description equal to undefined or null', async () => {
-  t.description = undefined;
-  await expect(t.validate()).rejects.toBeTruthy();
+  transactionModel.description = undefined;
+  await expect(transactionModel.validate()).rejects.toBeTruthy();
 
-  t.description = null;
-  await expect(t.validate()).rejects.toBeTruthy();
+  transactionModel.description = null;
+  await expect(transactionModel.validate()).rejects.toBeTruthy();
 });
 
 test('should rejects transactions with description field other than string', () => {
-  t.description = false;
-  expect(typeof t.description).toBe('string');
+  transactionModel.description = false;
+  expect(typeof transactionModel.description).toBe('string');
 
-  t.description = 0;
-  expect(typeof t.description).toBe('string');
+  transactionModel.description = 0;
+  expect(typeof transactionModel.description).toBe('string');
 });
 
-test('should find transactions by current month', async () => {
-  debugger;
-  let transactions = await Transaction.findByMonth();
-  return expect(transactions).toHaveLength(3);
+test('should find transactions by current month and year', async () => {
+  let transactions = await Transaction.findByMonthAndYear();
+  return expect(transactions).toHaveLength(2);
+});
+
+test('should find transactions by given month and year', async () => {
+  let transactions = await Transaction.findByMonthAndYear(1, 1970);
+  return expect(transactions).toHaveLength(1);
+});
+
+test('should divide a transaction in many parts with equal amount', () => {
+  let parts = transactionModel.divideInto(2);
+  expect(parts).toHaveLength(2);
+  expect(parts[0].amount).toBe(transaction.amount/2);
+  expect(parts[1].amount).toBe(transaction.amount/2);
+});
+
+test('should divide a transaction in parts with proper description', () => {
+  let parts = transactionModel.divideInto(2);
+  expect(parts[0].description).toBe(transaction.description + ' 1/2');
+  expect(parts[1].description).toBe(transaction.description + ' 2/2');
+});
+
+test('should divide a transaction in parts with different dates', () => {
+  let parts = transactionModel.divideInto(2);
+  expect(parts[0].date).toEqual(transaction.date);
+  expect(parts[1].date).toEqual(new Date(moment.utc(transaction.date).add(1, 'month').format()));
 });
