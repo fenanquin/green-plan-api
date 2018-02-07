@@ -110,3 +110,45 @@ test('should divide a transaction in parts with different dates', () => {
   expect(parts[0].date).toEqual(transaction.date);
   expect(parts[1].date).toEqual(new Date(moment.utc(transaction.date).add(1, 'month').format()));
 });
+
+
+test('should create recurring transactions for the specified date interval', () => {
+  let to = new Date(moment.utc(transaction.date).add(1, 'year').format());
+  let recurringTransactions = Transaction.createRecurring({...transaction}, to);
+  expect(recurringTransactions).toHaveLength(13);
+
+  let initialDate = new Date(moment.utc(transaction.date).startOf('day').format());
+  expect(recurringTransactions[0].date).toEqual(initialDate);
+
+  let sixMonthesAfter = new Date(moment.utc(transaction.date).startOf('day').add(6, 'month').format());
+  expect(recurringTransactions[6].date).toEqual(sixMonthesAfter);
+
+  let oneYearAfter = new Date(moment.utc(transaction.date).startOf('day').add(12, 'month').format());
+  expect(recurringTransactions[12].date).toEqual(oneYearAfter);
+});
+
+test('should create recurring transactions with same values except dates', () => {
+  let until = new Date(moment.utc(transaction.date).add(1, 'month').format());
+  let recurringTransactions = Transaction.createRecurring(transaction, until);
+  expect(recurringTransactions).toHaveLength(2);
+
+  let firstTransaction = recurringTransactions[0].toObject();
+  delete firstTransaction._id;
+  delete firstTransaction.date;
+
+  let secondTransaction = recurringTransactions[1].toObject();
+  delete secondTransaction._id;
+  delete secondTransaction.date;
+
+  expect(firstTransaction).toEqual(secondTransaction);
+});
+
+test('should create a recurring transaction with same values as original transaction', () => {
+  let until = new Date(moment.utc(transaction.date).add(1, 'day').format());
+  let recurringTransactions = Transaction.createRecurring(transaction, until);
+  expect(recurringTransactions).toHaveLength(1);
+
+  let oneTransaction = recurringTransactions[0].toObject();
+  delete oneTransaction._id;
+  expect(oneTransaction).toEqual(transaction);
+});

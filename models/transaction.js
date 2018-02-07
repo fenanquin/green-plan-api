@@ -38,6 +38,23 @@ TransactionSchema.statics.findByMonthAndYear = function(month, year) {
   return this.find({date: {$gte: startOf, $lte: endOf}}).exec();
 }
 
+TransactionSchema.statics.createRecurring = function (transaction, until) {
+  let begin = moment.utc(transaction.date).startOf('day');
+  let end = moment.utc(until).startOf('day');
+  let diff = end.diff(begin, 'months');
+  transaction.date = new Date(begin);
+  let recurring = [new Transaction(transaction)];
+
+  if (diff > 0) {
+    for (var i = 1; i <= diff; i++) {
+      transaction.date = new Date(moment.utc(transaction.date).startOf('day').add(1, 'month').format());
+      recurring.push(new Transaction(transaction));
+    }
+  }
+
+  return recurring;
+}
+
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
 module.exports = Transaction;
