@@ -55,6 +55,8 @@ TransactionSchema.statics.createRecurring = function (transaction, until) {
   return recurring;
 }
 
+TransactionSchema.set('toJSON', {versionKey: false});
+
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
 module.exports = Transaction;

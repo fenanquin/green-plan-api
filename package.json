@@ -9,9 +9,12 @@
   "author": "Fernando Aquino",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^22.1.4"
+    "jest": "^22.1.4",
+    "supertest": "^3.0.0"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
     "moment": "^2.20.1",
     "mongoose": "^5.0.3"
   }
