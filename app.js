@@ -16,4 +16,14 @@ app.post('/transactions', async (req, res) => {
   }
 });
 
+app.get('/transactions', async (req, res) => {
+  try {
+    let {month, year} = req.query;
+    let transactions = await Transaction.findByMonthAndYear(month, year);
+    res.json(transactions);
+  } catch (e) {
+    res.status(500).json(e);
+  }
+});
+
 module.exports = app;
