@@ -18,7 +18,7 @@ test('should create a new transaction', () => {
     .expect(200)
     .then(response => {
       expect (response.body._id).toEqual(expect.any(String));
-      expect(response.body).toEqual({...transactions[0], _id: expect.any(String), date: transactions[0].date.toJSON()});
+      expect(response.body).toEqual({...transactions[0], _id: expect.any(String), date: transactions[0].date.toJSON(), user: transactions[0].user.toString()});
 
       return Transaction.findById(response.body._id).then((t) => {
         expect(t).toEqual(expect.objectContaining(transactions[0]));
@@ -45,8 +45,8 @@ test('should get transactions of current year and month', () => {
     .expect(200)
     .then(response => {
       expect(response.body).toHaveLength(2);
-      expect(response.body[0]).toEqual({...transactions[0], _id: expect.any(String), date: transactions[0].date.toJSON()});
-      expect(response.body[1]).toEqual({...transactions[1], _id: expect.any(String), date: transactions[1].date.toJSON()});
+      expect(response.body[0]).toEqual({...transactions[0], _id: expect.any(String), date: transactions[0].date.toJSON(), user: transactions[0].user.toString()});
+      expect(response.body[1]).toEqual({...transactions[1], _id: expect.any(String), date: transactions[1].date.toJSON(), user: transactions[1].user.toString()});
     });
 });
 
@@ -56,6 +56,6 @@ test('should get transactions of given year and month', () => {
     .expect(200)
     .then(response => {
       expect(response.body).toHaveLength(1);
-      expect(response.body[0]).toEqual({...transactions[2], _id: expect.any(String), date: transactions[2].date.toJSON()});
+      expect(response.body[0]).toEqual({...transactions[2], _id: expect.any(String), date: transactions[2].date.toJSON(), user: transactions[2].user.toString()});
     });
 });

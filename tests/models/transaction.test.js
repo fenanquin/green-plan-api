@@ -82,6 +82,12 @@ test('should rejects transactions with description field other than string', () 
   expect(typeof transactionModel.description).toBe('string');
 });
 
+test('should rejects transactions without user field', () => {
+  delete transaction.user;
+  transactionModel = new Transaction(transaction);
+  return expect(transactionModel.validate()).rejects.toBeTruthy();
+});
+
 test('should find transactions by current month and year', async () => {
   let transactions = await Transaction.findByMonthAndYear();
   return expect(transactions).toHaveLength(2);
