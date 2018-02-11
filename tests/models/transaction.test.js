@@ -89,13 +89,13 @@ test('should rejects transactions without user field', () => {
 });
 
 test('should find transactions by current month and year', async () => {
-  let transactions = await Transaction.findByMonthAndYear();
-  return expect(transactions).toHaveLength(2);
+  let retrivedData = await Transaction.findByMonthAndYear(transactions[0].user);
+  return expect(retrivedData).toHaveLength(2);
 });
 
 test('should find transactions by given month and year', async () => {
-  let transactions = await Transaction.findByMonthAndYear(1, 1970);
-  return expect(transactions).toHaveLength(1);
+  let retrivedData = await Transaction.findByMonthAndYear(transactions[0].user, 1, 1970);
+  return expect(retrivedData).toHaveLength(1);
 });
 
 test('should divide a transaction in many parts with equal amount', () => {

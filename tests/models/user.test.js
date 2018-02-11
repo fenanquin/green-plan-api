@@ -2,6 +2,14 @@ const User = require('../../models/user');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 
+beforeEach((done) => {
+  User.create({email:'a@a.com'}).then(() => done());
+});
+
+afterEach((done) => {
+  User.remove({}).then(() => done());
+});
+
 test('should rejects user without email', () => {
   let user = new User({});
   return expect(user.validate()).rejects.toBeTruthy();

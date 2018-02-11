@@ -35,11 +35,11 @@ TransactionSchema.methods.divideInto = function (numberOfParts) {
   return transactions;
 }
 
-TransactionSchema.statics.findByMonthAndYear = function(month, year) {
+TransactionSchema.statics.findByMonthAndYear = function(user, month, year) {
   let date = month && year ? moment.utc([year, month-1, 1]) : moment.utc();
   let startOf = new Date(date.startOf('month').format());
   let endOf = new Date(date.endOf('month').format());
-  return this.find({date: {$gte: startOf, $lte: endOf}}).exec();
+  return this.find({date: {$gte: startOf, $lte: endOf}, user}).exec();
 }
 
 TransactionSchema.statics.createRecurring = function (transaction, until) {

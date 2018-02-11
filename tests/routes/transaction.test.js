@@ -2,6 +2,20 @@ const request = require('supertest');
 const app = require('../../app');
 const transactions = require('../fixtures/transactions');
 const Transaction = require('../../models/transaction');
+const User = require('../../models/user');
+const mongoose = require('mongoose');
+
+let token;
+beforeAll((done) => {
+  User.create({_id: transactions[0].user, email: 'a@a.com'}).then((user) => {
+    token = user.generateToken();
+    done();
+  })
+});
+
+afterAll((done) => {
+  User.remove({}).then(() => done());
+})
 
 beforeEach((done) => {
   Transaction.create(transactions).then(() => done());
@@ -14,6 +28,7 @@ afterEach((done) => {
 test('should create a new transaction', () => {
   return request(app)
     .post('/transactions')
+    .set('x-auth', token)
     .send({...transactions[0]})
     .expect(200)
     .then(response => {
@@ -32,6 +47,7 @@ test('should not create a transaction with invalid data', () => {
 
   return request(app)
     .post('/transactions')
+    .set('x-auth', token)
     .send(reqBody)
     .expect(400)
     .then(response => {
@@ -39,9 +55,27 @@ test('should not create a transaction with invalid data', () => {
     });
 });
 
+test('should ignores _id field on request when creating a new transaction', () => {
+  return request(app)
+    .post('/transactions')
+    .set('x-auth', token)
+    .send({...transactions[0], _id: transactions[0].user})
+    .expect(200)
+    .then(response => {
+      expect(response.body._id).not.toBe(transactions[0].user.toString());
+    })
+});
+
+test('should respond with 401 status when no token is passed on post /transactions', () => {
+  return request(app)
+    .post('/transactions')
+    .expect(401)
+});
+
 test('should get transactions of current year and month', () => {
   return request(app)
     .get('/transactions')
+    .set('x-auth', token)
     .expect(200)
     .then(response => {
       expect(response.body).toHaveLength(2);
@@ -53,9 +87,33 @@ test('should get transactions of current year and month', () => {
 test('should get transactions of given year and month', () => {
   return request(app)
     .get('/transactions?month=1&year=1970')
+    .set('x-auth', token)
     .expect(200)
     .then(response => {
       expect(response.body).toHaveLength(1);
       expect(response.body[0]).toEqual({...transactions[2], _id: expect.any(String), date: transactions[2].date.toJSON(), user: transactions[2].user.toString()});
     });
+});
+
+test('should only get transactions of the given user', async () => {
+  let newUser = await User.create({email:'b@b.com'});
+  await newUser.save();
+  let t = await Transaction.findOne({user: transactions[0].user});
+  t.user = newUser._id;
+  await t.save();
+  return request(app)
+    .get('/transactions')
+    .set('x-auth', token)
+    .expect(200)
+    .then(response => {
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].user).not.toEqual(newUser._id.toString());
+      expect(response.body[0]._id).not.toEqual(t._id.toString());
+    });
+});
+
+test('should respond with 401 status when no token is passed on get /transactions', () => {
+  return request(app)
+    .get('/transactions')
+    .expect(401)
 });
