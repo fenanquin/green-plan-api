@@ -2,10 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Transaction = require('./models/transaction');
 const User = require('./models/user');
+const cors = require('cors');
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(cors());
 
 const authenticate = (req, res, next) => {
   let token = req.header('x-auth');
@@ -41,8 +43,8 @@ app.get('/transactions', authenticate, async (req, res) => {
   }
 });
 
-/*app.listen(3000, () => {
+app.listen(4000, () => {
   console.log(`App running.`);
-});*/
+});
 
 module.exports = app;

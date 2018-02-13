@@ -1,8 +1,8 @@
 {
   "name": "green-plan-api",
   "version": "1.0.0",
-  "description": "An API to track personal finances",
-  "main": "index.js",
+  "description": "An API to manage personal finances",
+  "main": "app.js",
   "scripts": {
     "test": "jest"
   },
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.1",
     "moment": "^2.20.1",

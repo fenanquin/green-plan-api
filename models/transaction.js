@@ -59,7 +59,14 @@ TransactionSchema.statics.createRecurring = function (transaction, until) {
   return recurring;
 }
 
-TransactionSchema.set('toJSON', {versionKey: false});
+TransactionSchema.set('toJSON', {
+  versionKey: false,
+  transform: (doc, ret) => {
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
+  }
+});
 
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
