@@ -59,6 +59,10 @@ TransactionSchema.statics.createRecurring = function (transaction, until) {
   return recurring;
 }
 
+TransactionSchema.statics.findBy = function(user, id) {
+  return this.findOne({_id: id, user}).exec();
+}
+
 TransactionSchema.set('toJSON', {
   versionKey: false,
   transform: (doc, ret) => {

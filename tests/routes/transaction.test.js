@@ -113,6 +113,24 @@ test('should only get transactions of the given user', async () => {
     });
 });
 
+test('should get transaction of given user and id', async () => {
+  let t = await Transaction.findOne({description: transactions[0].description});
+  return request(app)
+    .get(`/transactions/${t._id.toString()}`)
+    .set('x-auth', token)
+    .expect(200)
+    .then(response => {
+      expect(response.body).toEqual({...transactions[0], id: expect.any(String), date: transactions[0].date.toJSON(), user: transactions[0].user.toString()});
+    });
+});
+
+test('should respond with 404 status when no persisted transactions have the given id', async () => {
+  return request(app)
+    .get(`/transactions/${transactions[0].user.toString()}`)
+    .set('x-auth', token)
+    .expect(404);
+});
+
 test('should respond with 401 status when no token is passed on get /transactions', () => {
   return request(app)
     .get('/transactions')

@@ -158,3 +158,20 @@ test('should create a recurring transaction with same values as original transac
   delete oneTransaction._id;
   expect(oneTransaction).toEqual(transaction);
 });
+
+test('should not find any transactions without passing user id', async () => {
+  let oneTransaction = await Transaction.findOne();
+  let foundTransaction = await Transaction.findBy(undefined, oneTransaction._id.toString());
+  expect(foundTransaction).toBeNull();
+});
+
+test('should not find any transactions with object id that does not exist on database', async () => {
+  let foundTransaction = await Transaction.findBy(transactions[0].user, transactions[0].user);
+  expect(foundTransaction).toBeNull();
+});
+
+test('should find a transaction by existing id on database', async () => {
+  let oneTransaction = await Transaction.findOne();
+  let foundTransaction = await Transaction.findBy(oneTransaction.user.toString(), oneTransaction._id.toString());
+  expect(foundTransaction).toBeTruthy();
+});

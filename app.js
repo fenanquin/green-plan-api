@@ -43,6 +43,19 @@ app.get('/transactions', authenticate, async (req, res) => {
   }
 });
 
+app.get('/transactions/:id', authenticate, async (req, res) => {
+  try {
+    let transaction = await Transaction.findBy(req.user._id, req.params.id);
+    if (transaction) {
+      res.json(transaction);
+    } else {
+      res.status(404).end();
+    }
+  } catch (e) {
+    res.status(500).json(e);
+  }
+});
+
 app.listen(4000, () => {
   console.log(`App running.`);
 });
