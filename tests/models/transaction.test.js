@@ -175,3 +175,67 @@ test('should find a transaction by existing id on database', async () => {
   let foundTransaction = await Transaction.findBy(oneTransaction.user.toString(), oneTransaction._id.toString());
   expect(foundTransaction).toBeTruthy();
 });
+
+test('should not update any transactions without passing user id', async () => {
+  let oneTransaction = await Transaction.findOne();
+  const query = {
+    id: oneTransaction._id.toString()
+  };
+  const description = 'new description';
+  const newData = { description };
+  await expect(Transaction.modify(query, newData)).rejects.toBeUndefined();
+});
+
+test('should not update user field of a transaction', async () => {
+  const user = transactions[0].user.toString();
+  let oneTransaction = await Transaction.findOne();
+  const query = {
+    user,
+    id: oneTransaction._id.toString()
+  };
+  const newData = { user };
+  await expect(Transaction.modify(query, newData)).rejects.toBeUndefined();
+});
+
+test('should not update any transactions with object id that does not exist on database', () => {
+  const user = transactions[0].user.toString();
+  const query = {
+    user,
+    id: user
+  };
+  const newData = { description: 'new description' };
+  return expect(Transaction.modify(query, newData)).rejects.toBeUndefined();
+});
+
+test('should update the transaction with object that exists on database', async () => {
+  const user = transactions[0].user.toString();
+  let oneTransaction = await Transaction.findOne();
+  const query = {
+    user,
+    id: oneTransaction._id.toString()
+  };
+  const newData = { description: 'new description' };
+  await expect(Transaction.modify(query, newData)).resolves.toBeTruthy();
+
+  oneTransaction = await Transaction.findById(query.id);
+  expect(oneTransaction.description).toBe(newData.description);
+});
+
+test('should not remove any transactions without passing user id', async () => {
+  let oneTransaction = await Transaction.findOne();
+  let id = oneTransaction._id.toString();
+  await expect(Transaction.delete(undefined, id)).rejects.toBeUndefined();
+});
+
+test('should not remove any transactions with object that does not exist on database', () => {
+  let id = transactions[0].user.toString();
+  let user = id;
+  return expect(Transaction.delete(user, id)).rejects.toBeUndefined();
+});
+
+test('should remove the transaction with object that exists on database', async () => {
+  let oneTransaction = await Transaction.findOne();
+  let id = oneTransaction._id.toString();
+  let user = oneTransaction.user.toString();
+  await expect(Transaction.delete(user, id)).resolves.toBeTruthy();
+});

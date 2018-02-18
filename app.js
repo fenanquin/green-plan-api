@@ -56,6 +56,28 @@ app.get('/transactions/:id', authenticate, async (req, res) => {
   }
 });
 
+app.put('/transactions/:id', authenticate, async (req, res) => {
+  try {
+    const query = {
+      user: req.user._id,
+      id: req.params.id
+    };
+    await Transaction.modify(query, req.body);
+    res.status(200).send();
+  } catch (e) {
+    res.status(400).json({message: 'invalid'});
+  }
+});
+
+app.delete('/transactions/:id', authenticate, async (req, res) => {
+  try {
+    await Transaction.delete(req.user._id, req.params.id);
+    res.status(200).send();
+  } catch (e) {
+    res.status(400).json({message: 'invalid'});
+  }
+});
+
 app.listen(4000, () => {
   console.log(`App running.`);
 });

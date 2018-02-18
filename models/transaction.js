@@ -63,6 +63,24 @@ TransactionSchema.statics.findBy = function(user, id) {
   return this.findOne({_id: id, user}).exec();
 }
 
+TransactionSchema.statics.modify = async function(query, newData) {
+  let transaction = await Transaction.findBy(query.user, query.id);
+  if (transaction && !newData.user) {
+    return transaction.update({$set: newData});
+  } else {
+    return Promise.reject();
+  }
+}
+
+TransactionSchema.statics.delete = async function(user, id) {
+  let transaction = await Transaction.findBy(user, id);
+  if (transaction) {
+    return transaction.remove();
+  } else {
+    return Promise.reject();
+  }
+}
+
 TransactionSchema.set('toJSON', {
   versionKey: false,
   transform: (doc, ret) => {

@@ -131,6 +131,41 @@ test('should respond with 404 status when no persisted transactions have the giv
     .expect(404);
 });
 
+
+test('should update transaction of given user and id', async () => {
+  let t = await Transaction.findOne({description: transactions[0].description});
+  return request(app)
+    .put(`/transactions/${t._id.toString()}`)
+    .set('x-auth', token)
+    .send({description: 'new description'})
+    .expect(200);
+});
+
+
+test('should respond with 400 status when no persisted transactions have the given id', async () => {
+  return request(app)
+    .put(`/transactions/${transactions[0].user.toString()}`)
+    .set('x-auth', token)
+    .send({description: 'new description'})
+    .expect(400);
+});
+
+test('should remove transaction of given user and id', async () => {
+  let t = await Transaction.findOne({description: transactions[0].description});
+  return request(app)
+    .delete(`/transactions/${t._id.toString()}`)
+    .set('x-auth', token)
+    .expect(200);
+});
+
+
+test('should respond with 400 status when no persisted transactions have the given id', async () => {
+  return request(app)
+    .delete(`/transactions/${transactions[0].user.toString()}`)
+    .set('x-auth', token)
+    .expect(400);
+});
+
 test('should respond with 401 status when no token is passed on get /transactions', () => {
   return request(app)
     .get('/transactions')
